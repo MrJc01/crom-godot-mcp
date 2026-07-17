@@ -176,4 +176,25 @@ var catalog = []toolDef{
 		"action":  {"string", "Nome da ação"},
 		"pressed": {"boolean", "true = press, false = release (padrão true)"},
 	}, "action")},
+
+	// --- FASE 2: inspeção do JOGO EM EXECUÇÃO (verificar gameplay de verdade) ---
+	{"godot_get_runtime_scene_tree", "Lê a árvore de nós do JOGO EM EXECUÇÃO (não do editor) — requer play_scene rodando. Mostra a cena viva com posições.", schema(nil)},
+	{"godot_get_runtime_property", "Lê o valor de uma propriedade de um nó no JOGO EM EXECUÇÃO (ex: a posição da cobra). Requer play_scene rodando.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó na cena em execução ('.' para a raiz)"},
+		"property":  {"string", "Propriedade (ex: position, visible, text)"},
+	}, "node_path", "property")},
+	{"godot_record_property_over_time", "Amostra uma propriedade de um nó várias vezes ao longo do tempo e diz se ela MUDOU — é como você confirma que 'a cobra se move' (gameplay funciona), não só que não deu erro. Requer play_scene rodando.", schema(map[string][2]string{
+		"node_path":   {"string", "Caminho do nó ('.' para a raiz)"},
+		"property":    {"string", "Propriedade a observar (padrão: position)"},
+		"samples":     {"number", "Quantas leituras (2-20, padrão 5)"},
+		"interval_ms": {"number", "Intervalo entre leituras em ms (padrão 250)"},
+	}, "node_path")},
+
+	{"godot_verify_playable", "FECHA O FEEDBACK LOOP num único passo: roda a cena, espera o boot, checa erros de console E detecta se algo se move em runtime, devolvendo um veredito 'jogável' (playable=true/false). Use como verificação final antes de dizer que terminou — só finalize com playable=true.", schema(map[string][2]string{
+		"scene_path":    {"string", "Cena a rodar (vazio = cena principal do projeto)"},
+		"node_path":     {"string", "Nó para checar movimento ('.' = cena atual, padrão)"},
+		"property":      {"string", "Propriedade observada para movimento (padrão: position)"},
+		"check_movement": {"boolean", "Se deve verificar movimento em runtime (padrão true)"},
+		"boot_wait_ms":  {"number", "Espera de boot em ms antes de checar (500-8000, padrão 2000)"},
+	})},
 }
