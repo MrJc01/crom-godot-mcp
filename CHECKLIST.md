@@ -56,11 +56,11 @@ que roda dentro do editor). O Go é só o encaminhador; o trabalho real é GDScr
 
 O agente hoje age mas não vê o resultado. Sem isso, nada mais importa.
 
-- [ ] ⭐ `godot_get_console_errors` — lê os `SCRIPT ERROR` / `Parse Error` / `ERROR` recentes do log do Godot (editor + jogo em execução) e devolve ao agente
-- [ ] ⭐ `godot_get_output` — devolve o conteúdo recente do painel Output (prints, avisos)
-- [ ] `godot_clear_output` — limpa o log/buffer antes de um novo teste (baseline limpo)
+- [x] ⭐ `godot_get_console_errors` — lê os `SCRIPT ERROR` / `Parse Error` / `ERROR` recentes do log do Godot (editor + jogo em execução) e devolve ao agente
+- [x] ⭐ `godot_get_output` — devolve o conteúdo recente do painel Output (prints, avisos)
+- [x] `godot_clear_output` — limpa o log/buffer antes de um novo teste (baseline limpo)
 - [ ] ⭐ `godot_play_scene` **retornando erros** — após rodar, coletar e devolver os erros do console (upgrade do atual)
-- [ ] 🆕 `godot_gdscript_check` — valida a sintaxe de um .gd (parse) ANTES de anexar, sem rodar a cena
+- [x] 🆕 `godot_gdscript_check` — valida a sintaxe de um .gd (parse) ANTES de anexar, sem rodar a cena
 - [ ] 🆕 ⭐ `godot_verify_playable` — composto: play → coleta erros → (0 erros) → simula input → confirma que o estado mudou → devolve veredito "jogável / não jogável + porquê"
 
 ---
@@ -94,8 +94,8 @@ Transforma "achei que terminei" em "verifiquei que funciona".
 
 Para "jogar" o jogo e ver se responde.
 
-- [ ] ⭐ `godot_simulate_key` — pressiona/solta uma tecla (setas, WASD, espaço, enter)
-- [ ] `godot_simulate_action` — dispara uma ação do InputMap (ui_accept, jump…)
+- [x] ⭐ `godot_simulate_key` — pressiona/solta uma tecla (setas, WASD, espaço, enter)
+- [x] `godot_simulate_action` — dispara uma ação do InputMap (ui_accept, jump…)
 - [ ] `godot_simulate_mouse` — clique/movimento do mouse em coordenada
 - [ ] `godot_input_sequence` — sequência de inputs com frame-delays (ex.: direita, direita, cima)
 - [ ] 🟡 `godot_simulate_editor_input` — *existe no plugin, mas fraco; refazer/expor melhor*
@@ -104,31 +104,31 @@ Para "jogar" o jogo e ver se responde.
 
 ## Fase 5 — SCRIPTS & CÓDIGO (edição fina)
 
-- [ ] `godot_read_script` — ler o script de um nó
+- [x] `godot_read_script` — ler o script de um nó
 - [ ] `godot_set_script_source` — reescrever o corpo de um script existente
 - [ ] `godot_detach_script` — remover script de um nó
-- [ ] `godot_list_node_methods` — métodos/sinais disponíveis de um nó (ajuda o agente a acertar nomes)
-- [ ] `godot_list_node_signals` — sinais de um nó (para connect_signal correto)
+- [x] `godot_list_node_methods` — métodos/sinais disponíveis de um nó (ajuda o agente a acertar nomes)
+- [x] `godot_list_node_signals` — sinais de um nó (para connect_signal correto)
 
 ---
 
 ## Fase 6 — NÓS AVANÇADO
 
-- [ ] `godot_duplicate_node` — duplicar nó (com filhos)
-- [ ] `godot_add_to_group` / `godot_remove_from_group` — grupos de nós
+- [x] `godot_duplicate_node` — duplicar nó (com filhos)
+- [x] `godot_add_to_group` / `godot_remove_from_group` — grupos de nós
 - [ ] `godot_set_node_owner` — corrigir owner (evita nós que não salvam)
 - [ ] `godot_batch_add_nodes` — adicionar vários nós de uma vez (menos turnos)
-- [ ] 🆕 `godot_get_node_config_warnings` — avisos de configuração do nó (ex.: CollisionShape2D sem shape)
+- [x] 🆕 `godot_get_node_config_warnings` — avisos de configuração do nó (ex.: CollisionShape2D sem shape)
 
 ---
 
 ## Fase 7 — RECURSOS & PROJETO
 
-- [ ] `godot_create_resource` — criar .tres (ex.: RectangleShape2D, StyleBox)
+- [x] `godot_create_resource` — criar .tres (ex.: RectangleShape2D, StyleBox)
 - [ ] `godot_set_resource_property` — editar um recurso
 - [ ] `godot_import_asset` — reimportar/registrar asset
-- [ ] `godot_get_project_setting` — ler configuração (hoje só escreve)
-- [ ] `godot_list_input_actions` — listar o InputMap atual
+- [x] `godot_get_project_setting` — ler configuração (hoje só escreve)
+- [x] `godot_list_input_actions` — listar o InputMap atual
 
 ---
 
@@ -146,7 +146,7 @@ Para "jogar" o jogo e ver se responde.
 
 O modelo deriva para Godot 3 (`update()`, `Color.gray`, `yield`). Duas defesas:
 
-- [ ] 🆕 ⭐ **Skill "Godot 4 GDScript"** — arquivo `.crom` (o crom-agente já tem `internal/skills`)
+- [x] 🆕 ⭐ **Skill "Godot 4 GDScript"** (arquivo criado em addons/crom_ai/skills/godot4.crom; falta o daemon carregar — ver nota) — arquivo `.crom` (o crom-agente já tem `internal/skills`)
       sempre injetado: migrações 3→4 (`yield`→`await`, `update()`→`queue_redraw()`,
       `.instance()`→`.instantiate()`, `Color.gray`→`Color.GRAY`, `KinematicBody2D`→`CharacterBody2D`),
       "Timer precisa de start()/autostart", "conecte sinais", padrões de nó.

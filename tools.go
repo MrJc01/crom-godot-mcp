@@ -72,7 +72,7 @@ var catalog = []toolDef{
 	}, "signal", "method")},
 
 	// --- Scripts & Cenas ---
-	{"godot_create_and_attach_script", "Cria um GDScript e anexa ao nó indicado.", schema(map[string][2]string{
+	{"godot_create_and_attach_script", "Cria um GDScript e anexa ao nó indicado. ESCREVA GODOT 4 (nunca Godot 3): use queue_redraw() (não update()); Color.GRAY/Color.RED em MAIÚSCULO (não Color.gray); await (não yield); packed.instantiate() (não .instance()); CharacterBody2D (não KinematicBody2D). Um Timer só funciona com autostart=true OU start(), e o sinal timeout precisa ser conectado (godot_connect_signal). Valide com godot_gdscript_check antes.", schema(map[string][2]string{
 		"node_path":     {"string", "Nó que recebe o script ('.' para a raiz)"},
 		"script_path":   {"string", "Caminho res:// do .gd"},
 		"gdscript_code": {"string", "Código GDScript 4 completo"},
@@ -118,4 +118,62 @@ var catalog = []toolDef{
 	})},
 	{"godot_stop_scene", "Para a execução da cena em teste.", schema(nil)},
 	{"godot_capture_screenshot", "Captura um screenshot e salva como PNG, retornando o caminho.", schema(nil)},
+
+	// --- FASE 1: laço de feedback (ver os próprios erros) ---
+	{"godot_get_console_errors", "Retorna os erros recentes do console do Godot (SCRIPT ERROR, Parse Error, ERROR) — do editor e do jogo executado por play_scene. Chame DEPOIS de play_scene para verificar se o jogo roda sem erro.", schema(nil)},
+	{"godot_get_output", "Retorna as últimas linhas do painel Output (prints, avisos).", schema(map[string][2]string{
+		"lines": {"number", "Quantas linhas (padrão 60)"},
+	})},
+	{"godot_clear_output", "Marca o ponto atual do console como baseline: get_console_errors/get_output passam a olhar só o que vier depois. Chame antes de um novo teste.", schema(nil)},
+	{"godot_gdscript_check", "Valida a sintaxe de um GDScript SEM rodar a cena (parse). Use antes de anexar para pegar erros de sintaxe cedo.", schema(map[string][2]string{
+		"script_path":   {"string", "Caminho res:// de um .gd existente (ou use gdscript_code)"},
+		"gdscript_code": {"string", "Código a validar diretamente"},
+	})},
+
+	// --- FASE 5/6: inspeção de scripts e nós (o agente acerta os nomes) ---
+	{"godot_read_script", "Lê o código-fonte do script anexado a um nó.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó ('.' para a raiz)"},
+	}, "node_path")},
+	{"godot_list_node_methods", "Lista os métodos disponíveis de um nó (ajuda a chamar/conectar com nomes corretos).", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó ('.' para a raiz)"},
+	}, "node_path")},
+	{"godot_list_node_signals", "Lista os sinais de um nó (para usar connect_signal corretamente).", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó ('.' para a raiz)"},
+	}, "node_path")},
+	{"godot_get_node_config_warnings", "Retorna avisos de configuração de um nó (ex: CollisionShape2D sem shape, Timer mal configurado).", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó ('.' para a raiz)"},
+	}, "node_path")},
+	{"godot_duplicate_node", "Duplica um nó (com filhos) na cena aberta.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó a duplicar"},
+		"new_name":  {"string", "Nome do duplicado (opcional)"},
+	}, "node_path")},
+	{"godot_add_to_group", "Adiciona um nó a um grupo (persistente na cena).", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó"},
+		"group":     {"string", "Nome do grupo (ex: enemies, food)"},
+	}, "node_path", "group")},
+	{"godot_remove_from_group", "Remove um nó de um grupo.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó"},
+		"group":     {"string", "Nome do grupo"},
+	}, "node_path", "group")},
+
+	// --- FASE 7: recursos e projeto (leitura) ---
+	{"godot_get_project_setting", "Lê uma configuração do project.godot.", schema(map[string][2]string{
+		"setting": {"string", "Ex: application/run/main_scene"},
+	}, "setting")},
+	{"godot_list_input_actions", "Lista as ações de input definidas no projeto (InputMap).", schema(nil)},
+	{"godot_create_resource", "Cria (e opcionalmente salva) um recurso .tres (ex: RectangleShape2D, CircleShape2D, StyleBoxFlat).", schema(map[string][2]string{
+		"resource_type": {"string", "Classe do Resource (ex: RectangleShape2D)"},
+		"save_path":     {"string", "Caminho res:// para salvar (.tres) — opcional"},
+		"properties":    {"object", "Propriedades iniciais (ex: {\"size\":[32,32]})"},
+	}, "resource_type")},
+
+	// --- FASE 4: simulação de input (testar jogabilidade) ---
+	{"godot_simulate_key", "Simula pressionar/soltar uma tecla física (para testar o jogo em execução).", schema(map[string][2]string{
+		"key":     {"string", "Tecla (ex: Up, Down, W, Space, Enter)"},
+		"pressed": {"boolean", "true = pressiona, false = solta (padrão true)"},
+	}, "key")},
+	{"godot_simulate_action", "Simula uma ação do InputMap (ex: ui_accept, jump).", schema(map[string][2]string{
+		"action":  {"string", "Nome da ação"},
+		"pressed": {"boolean", "true = press, false = release (padrão true)"},
+	}, "action")},
 }
