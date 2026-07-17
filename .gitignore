@@ -1,0 +1,4 @@
+/crom-godot-mcp
+/crom-godot-mcp-*
+*.exe
+/dist/
