@@ -38,19 +38,22 @@ var catalog = []toolDef{
 	// --- Cena & Nós ---
 	{"godot_get_scene_tree", "Lê a árvore de nós da cena aberta no Editor (nomes, tipos, caminhos, filhos).", schema(nil)},
 	{"godot_get_open_editor_context", "Contexto do Editor: scripts abertos, cena em edição e nós selecionados.", schema(nil)},
-	{"godot_add_node", "Adiciona um nó novo na cena aberta.", schema(map[string][2]string{
+	{"godot_add_node", "Adiciona um nó novo na cena aberta. As 'properties' podem incluir RECURSOS INLINE: para dar um shape a um CollisionShape2D numa única chamada, use {\"shape\":{\"__resource_type\":\"RectangleShape2D\",\"size\":[32,32]}}. Para textura de Sprite2D use o caminho res:// direto: {\"texture\":\"res://icon.svg\"}. Assim você monta um nó completo (com colisão/visual) sem chamadas extras.", schema(map[string][2]string{
 		"node_type":   {"string", "Classe Godot (ex: Sprite2D, CharacterBody2D, Timer, Label)"},
 		"node_name":   {"string", "Nome do novo nó"},
 		"parent_path": {"string", "Caminho do pai ('.' para a raiz)"},
-		"properties":  {"object", "Propriedades iniciais (ex: {\"position\":[100,200]})"},
+		"properties":  {"object", "Propriedades iniciais. Vetores [x,y]; cores [r,g,b,a]; recurso inline {\"__resource_type\":\"CircleShape2D\",\"radius\":16}; recurso/textura no disco por caminho res://."},
 	}, "node_type", "node_name")},
+	{"godot_add_nodes_batch", "Cria VÁRIOS nós de uma vez (uma subárvore inteira) — prefira isto a chamar add_node repetidamente: menos idas-e-vindas, menos erros. Ordene os itens com pais antes dos filhos. Cada item aceita node_type, node_name, parent_path e properties (incl. recursos inline).", schema(map[string][2]string{
+		"nodes": {"array", "Array de {node_type, node_name, parent_path, properties}. Ex: [{\"node_type\":\"CharacterBody2D\",\"node_name\":\"Player\",\"parent_path\":\".\"},{\"node_type\":\"CollisionShape2D\",\"node_name\":\"Col\",\"parent_path\":\"Player\",\"properties\":{\"shape\":{\"__resource_type\":\"RectangleShape2D\",\"size\":[32,32]}}}]"},
+	}, "nodes")},
 	{"godot_remove_node", "Remove um nó da cena aberta.", schema(map[string][2]string{
 		"node_path": {"string", "Caminho do nó"},
 	}, "node_path")},
-	{"godot_set_node_property", "Altera uma propriedade de um nó (position, scale, text, modulate, visible, autostart, wait_time...).", schema(map[string][2]string{
+	{"godot_set_node_property", "Altera uma propriedade de um nó (position, scale, text, modulate, visible, autostart, wait_time...). Para propriedades que são RECURSOS: passe um objeto inline {\"__resource_type\":\"RectangleShape2D\",\"size\":[32,32]} (ex: property='shape' de um CollisionShape2D) OU um caminho res:// de um recurso/textura no disco (ex: property='texture', value='res://player.png').", schema(map[string][2]string{
 		"node_path": {"string", "Caminho do nó"},
-		"property":  {"string", "Nome da propriedade"},
-		"value":     {"string|number|boolean|array|object", "Valor. Vetores [x,y]/[x,y,z]; cores [r,g,b,a]"},
+		"property":  {"string", "Nome da propriedade (ex: shape, texture, position, text)"},
+		"value":     {"string|number|boolean|array|object", "Valor. Vetores [x,y]/[x,y,z]; cores [r,g,b,a]; recurso inline {\"__resource_type\":...}; ou caminho res://"},
 	}, "node_path", "property", "value")},
 	{"godot_move_node", "Move um nó 2D/3D/Control para uma posição.", schema(map[string][2]string{
 		"node_path": {"string", "Caminho do nó"},
@@ -90,6 +93,9 @@ var catalog = []toolDef{
 	{"godot_save_scene", "Salva a cena aberta no disco.", schema(nil)},
 	{"godot_open_scene", "Abre uma cena .tscn no Editor.", schema(map[string][2]string{
 		"scene_path": {"string", "Cena res://"},
+	}, "scene_path")},
+	{"godot_set_main_scene", "Define a cena principal do projeto (a que roda no F5 e no export). Um jogo PRECISA disso — chame depois de criar a cena principal.", schema(map[string][2]string{
+		"scene_path": {"string", "Cena res:// que será a principal"},
 	}, "scene_path")},
 
 	// --- Projeto & Arquivos ---
