@@ -190,6 +190,10 @@ var catalog = []toolDef{
 		"interval_ms": {"number", "Intervalo entre leituras em ms (padrão 250)"},
 	}, "node_path")},
 
+	{"godot_class_reference", "DOCUMENTAÇÃO VIVA: consulta a API autoritativa da versão do Godot em uso (via ClassDB) para uma classe — métodos com assinatura, propriedades, sinais e constantes. Use ANTES de escrever código para uma classe que não domina (ex.: CharacterBody2D, Timer, TileMap) e garanta a sintaxe Godot 4 correta. Se a classe não existir, devolve nomes parecidos.", schema(map[string][2]string{
+		"class_name": {"string", "Nome da classe Godot (ex.: CharacterBody2D). Parcial faz busca."},
+	}, "class_name")},
+
 	{"godot_verify_playable", "FECHA O FEEDBACK LOOP num único passo: roda a cena, espera o boot, checa erros de console E detecta se algo se move em runtime, devolvendo um veredito 'jogável' (playable=true/false). Use como verificação final antes de dizer que terminou — só finalize com playable=true.", schema(map[string][2]string{
 		"scene_path":    {"string", "Cena a rodar (vazio = cena principal do projeto)"},
 		"node_path":     {"string", "Nó para checar movimento ('.' = cena atual, padrão)"},
