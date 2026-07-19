@@ -1,5 +1,13 @@
 # crom-godot-mcp — Checklist mestre de ferramentas
 
+> **ATUALIZAÇÃO (2026-07-18): 53 ferramentas implementadas.** O laço de feedback
+> está COMPLETO (`verify_playable`, `class_reference`, `gdscript_check`,
+> `get_console_errors`, `record_property_over_time`, runtime tree/property). Este
+> arquivo é o plano por fases; para a **paridade completa vs godot-mcp-pro (175
+> tools)** veja **[CHECKLIST_PARIDADE_GODOT_MCP_PRO.md](CHECKLIST_PARIDADE_GODOT_MCP_PRO.md)**.
+> Consolidação: este é o **único** MCP — as tools do antigo `crom-godot-agent/go`
+> foram portadas para cá.
+
 Servidor MCP (Go) que expõe o Editor Godot para agentes de IA (crom-agente).
 Este documento é o **plano de construção**: cada ferramenta MCP declarada aqui no Go
 (`tools.go`) precisa de uma **ação correspondente no plugin** (`command_processor.gd`,
@@ -61,7 +69,7 @@ O agente hoje age mas não vê o resultado. Sem isso, nada mais importa.
 - [x] `godot_clear_output` — limpa o log/buffer antes de um novo teste (baseline limpo)
 - [ ] ⭐ `godot_play_scene` **retornando erros** — após rodar, coletar e devolver os erros do console (upgrade do atual)
 - [x] 🆕 `godot_gdscript_check` — valida a sintaxe de um .gd (parse) ANTES de anexar, sem rodar a cena
-- [ ] 🆕 ⭐ `godot_verify_playable` — composto: play → coleta erros → (0 erros) → simula input → confirma que o estado mudou → devolve veredito "jogável / não jogável + porquê"
+- [x] 🆕 ⭐ `godot_verify_playable` — composto: play → coleta erros → (0 erros) → simula input → confirma que o estado mudou → devolve veredito "jogável / não jogável + porquê"
 
 ---
 
@@ -69,10 +77,10 @@ O agente hoje age mas não vê o resultado. Sem isso, nada mais importa.
 
 Detectar bugs de gameplay (ex.: "a cobra não se move") que 1 screenshot não pega.
 
-- [ ] ⭐ `godot_capture_frames` — captura N frames com intervalo (detecta movimento/animação)
-- [ ] ⭐ `godot_get_runtime_scene_tree` — árvore de nós do JOGO em execução (não do editor)
-- [ ] ⭐ `godot_get_runtime_property` — ler propriedade de um nó no jogo rodando (ex.: posição da cobra)
-- [ ] `godot_record_property_over_time` — grava valores de uma propriedade por N frames (prova de movimento)
+- [x] ⭐ `godot_capture_frames` — captura N frames com intervalo (detecta movimento/animação)
+- [x] ⭐ `godot_get_runtime_scene_tree` — árvore de nós do JOGO em execução (não do editor)
+- [x] ⭐ `godot_get_runtime_property` — ler propriedade de um nó no jogo rodando (ex.: posição da cobra)
+- [x] `godot_record_property_over_time` — grava valores de uma propriedade por N frames (prova de movimento)
 - [ ] `godot_get_runtime_nodes_by_type` — achar nós por classe/script no jogo em execução
 - [ ] `godot_watch_signal` — registra emissões de um sinal durante a execução
 
@@ -105,8 +113,8 @@ Para "jogar" o jogo e ver se responde.
 ## Fase 5 — SCRIPTS & CÓDIGO (edição fina)
 
 - [x] `godot_read_script` — ler o script de um nó
-- [ ] `godot_set_script_source` — reescrever o corpo de um script existente
-- [ ] `godot_detach_script` — remover script de um nó
+- [x] `godot_set_script_source` — reescrever o corpo de um script existente
+- [x] `godot_detach_script` — remover script de um nó
 - [x] `godot_list_node_methods` — métodos/sinais disponíveis de um nó (ajuda o agente a acertar nomes)
 - [x] `godot_list_node_signals` — sinais de um nó (para connect_signal correto)
 
@@ -150,11 +158,11 @@ O modelo deriva para Godot 3 (`update()`, `Color.gray`, `yield`). Duas defesas:
       sempre injetado: migrações 3→4 (`yield`→`await`, `update()`→`queue_redraw()`,
       `.instance()`→`.instantiate()`, `Color.gray`→`Color.GRAY`, `KinematicBody2D`→`CharacterBody2D`),
       "Timer precisa de start()/autostart", "conecte sinais", padrões de nó.
-- [ ] 🆕 `godot_docs_search` — busca por palavra-chave na doc offline do Godot 4
+- [x] 🆕 `godot_docs_search` — busca por palavra-chave na doc offline do Godot 4
       (`crom-godot-ai/docs/godot-docs-stable.zip` já existe) → classe/membro/exemplo.
       *Começar com busca estruturada por classe (Timer → start/autostart/wait_time/timeout);
       RAG com embeddings só se a busca simples não bastar.*
-- [ ] 🆕 `godot_class_reference` — retorna métodos/propriedades/sinais de uma classe Godot
+- [x] 🆕 `godot_class_reference` — retorna métodos/propriedades/sinais de uma classe Godot
 
 ---
 

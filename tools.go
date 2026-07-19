@@ -207,4 +207,55 @@ var catalog = []toolDef{
 		"check_movement": {"boolean", "Se deve verificar movimento em runtime (padrão true)"},
 		"boot_wait_ms":  {"number", "Espera de boot em ms antes de checar (500-8000, padrão 2000)"},
 	})},
+
+	// --- Scripts (editar sem recriar) ---
+	{"godot_set_script_source", "Edita o código-fonte de um script GDScript JÁ existente (anexado a um nó ou no disco) sem recriar o nó. Use node_path para editar o script de um nó, ou script_path para editar direto pelo caminho res://.", schema(map[string][2]string{
+		"node_path":     {"string", "Caminho do nó cujo script será editado ('.' para a raiz). Opcional se script_path for dado."},
+		"script_path":   {"string", "Caminho res:// do arquivo .gd a editar. Opcional se node_path for dado."},
+		"gdscript_code": {"string", "Código GDScript 4 completo novo"},
+	}, "gdscript_code")},
+	{"godot_detach_script", "Remove o script de um nó da cena sem excluir o arquivo .gd do disco.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó ('.' para a raiz da cena)"},
+	}, "node_path")},
+
+	// --- TileMap ---
+	{"godot_set_tilemap_cell", "Define uma célula num TileMapLayer ou TileMap da cena aberta.", schema(map[string][2]string{
+		"node_path":        {"string", "Caminho do nó TileMap/TileMapLayer na cena"},
+		"coords":           {"array", "Coordenadas da célula [x, y]"},
+		"source_id":        {"number", "ID da fonte de tile no TileSet (padrão: 0)"},
+		"atlas_coords":     {"array", "Coordenadas no atlas [x, y] (padrão: [0,0])"},
+		"alternative_tile": {"number", "ID do tile alternativo (padrão: 0)"},
+		"layer":            {"number", "Layer do TileMap legado (só TileMap, padrão: 0)"},
+	}, "node_path", "coords")},
+	{"godot_get_tilemap_cells", "Retorna as células usadas de um TileMapLayer ou TileMap.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó TileMap/TileMapLayer"},
+		"layer":     {"number", "Layer do TileMap legado (só TileMap, padrão: 0)"},
+	}, "node_path")},
+
+	// --- Animação ---
+	{"godot_list_animations", "Lista as animações de um AnimationPlayer ou os sprite_frames de um AnimatedSprite2D.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó AnimationPlayer ou AnimatedSprite2D"},
+	}, "node_path")},
+	{"godot_play_animation", "Toca uma animação por nome num AnimationPlayer ou AnimatedSprite2D.", schema(map[string][2]string{
+		"node_path":      {"string", "Caminho do nó AnimationPlayer ou AnimatedSprite2D"},
+		"animation_name": {"string", "Nome da animação a tocar"},
+	}, "node_path", "animation_name")},
+
+	// --- Câmera ---
+	{"godot_set_camera_target", "Configura posição, zoom e limites de uma Camera2D da cena.", schema(map[string][2]string{
+		"node_path":         {"string", "Caminho do nó Camera2D"},
+		"position":          {"array", "Posição [x, y]"},
+		"zoom":              {"number|array", "Zoom: número escalar ou [x, y]"},
+		"limit_left":        {"number", "Limite esquerdo (pixels)"},
+		"limit_top":         {"number", "Limite superior (pixels)"},
+		"limit_right":       {"number", "Limite direito (pixels)"},
+		"limit_bottom":      {"number", "Limite inferior (pixels)"},
+		"smoothing_enabled": {"boolean", "Ativa/desativa suavização de posição"},
+	}, "node_path")},
+
+	// --- Documentação offline ---
+	{"godot_docs_search", "Busca textual na documentação offline do Godot. Complementa godot_class_reference para tutoriais, guias e conceitos.", schema(map[string][2]string{
+		"query":       {"string", "Termo de busca (ex: 'TileMap', 'move_and_slide', 'signals')"},
+		"max_results": {"number", "Número máximo de resultados (padrão: 5, máx: 20)"},
+	}, "query")},
 }
