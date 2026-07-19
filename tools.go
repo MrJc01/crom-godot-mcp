@@ -258,4 +258,103 @@ var catalog = []toolDef{
 		"query":       {"string", "Termo de busca (ex: 'TileMap', 'move_and_slide', 'signals')"},
 		"max_results": {"number", "Número máximo de resultados (padrão: 5, máx: 20)"},
 	}, "query")},
+
+	// --- Runtime & QA (jogo em execução — requer play_scene rodando) ---
+	{"godot_set_game_node_property", "Altera uma propriedade de um nó no JOGO EM EXECUÇÃO (não no editor). Útil para testar reações (ex: forçar position, health). Requer play_scene rodando.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó na cena em execução ('.' para a raiz)"},
+		"property":  {"string", "Nome da propriedade"},
+		"value":     {"string|number|boolean|array", "Valor. Vetores [x,y]; cores [r,g,b,a]"},
+	}, "node_path", "property", "value")},
+	{"godot_get_game_node_properties", "Retorna TODAS as propriedades editáveis de um nó no JOGO EM EXECUÇÃO. Requer play_scene rodando.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó na cena em execução ('.' para a raiz)"},
+	}, "node_path")},
+	{"godot_wait_for_node", "Espera (com timeout) um nó aparecer no JOGO EM EXECUÇÃO. Use antes de asserts sobre nós criados dinamicamente. Requer play_scene rodando.", schema(map[string][2]string{
+		"node_path":  {"string", "Caminho do nó a esperar"},
+		"timeout_ms": {"number", "Timeout em ms (200-10000, padrão 3000)"},
+	}, "node_path")},
+	{"godot_assert_node_state", "QA: afirma que uma propriedade de um nó no JOGO EM EXECUÇÃO tem o valor esperado. Devolve passed=true/false. Requer play_scene rodando.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó ('.' para a raiz)"},
+		"property":  {"string", "Propriedade a checar (ex: position, text, visible)"},
+		"expected":  {"string|number|boolean", "Valor esperado (comparação por igualdade/substring)"},
+	}, "node_path", "property", "expected")},
+	{"godot_assert_screen_text", "QA: afirma que um texto aparece na tela do jogo (em Labels/Buttons visíveis). Ex: confirmar 'Score: 10' ou 'Game Over'. Requer play_scene rodando.", schema(map[string][2]string{
+		"text": {"string", "Texto (ou trecho) que deve aparecer na tela"},
+	}, "text")},
+	{"godot_find_ui_elements", "Lista nós do JOGO EM EXECUÇÃO por tipo (ex: Button, Label, Control) com caminho — para localizar UI antes de interagir. Requer play_scene rodando.", schema(map[string][2]string{
+		"type": {"string", "Classe a filtrar (ex: Button, Label). Vazio = todos"},
+	})},
+	{"godot_click_button_by_text", "Aciona (emite 'pressed') um Button do JOGO EM EXECUÇÃO pelo seu texto — para testar menus/UI. Requer play_scene rodando.", schema(map[string][2]string{
+		"text": {"string", "Texto do botão a clicar"},
+	}, "text")},
+
+	// --- Nós & Cena (inspeção/edição fina no editor) ---
+	{"godot_get_node_properties", "Retorna TODAS as propriedades editáveis de um nó na cena aberta no editor (nome → valor). Use para saber o estado atual antes de alterar.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó ('.' para a raiz)"},
+	}, "node_path")},
+	{"godot_disconnect_signal", "Desconecta um sinal de um nó (inverso de connect_signal), removendo a ligação da cena.", schema(map[string][2]string{
+		"from_node": {"string", "Nó emissor ('.' para a raiz)"},
+		"signal":    {"string", "Nome do sinal"},
+		"to_node":   {"string", "Nó receptor ('.' para a raiz)"},
+		"method":    {"string", "Método conectado"},
+	}, "signal", "method")},
+	{"godot_find_nodes_in_group", "Lista os nós da cena aberta que pertencem a um grupo (ex: 'enemies', 'coins').", schema(map[string][2]string{
+		"group": {"string", "Nome do grupo"},
+	}, "group")},
+	{"godot_get_node_groups", "Retorna os grupos aos quais um nó pertence.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó ('.' para a raiz)"},
+	}, "node_path")},
+	{"godot_delete_scene", "Apaga um arquivo de cena .tscn do disco.", schema(map[string][2]string{
+		"scene_path": {"string", "Caminho res:// da cena a apagar"},
+	}, "scene_path")},
+	{"godot_get_project_info", "Retorna informações do projeto: nome, cena principal, versão do Godot e features.", schema(nil)},
+	{"godot_search_files", "Busca arquivos sob res:// por nome (e opcionalmente conteúdo). Útil para achar scripts/cenas.", schema(map[string][2]string{
+		"query":          {"string", "Termo a buscar no nome do arquivo"},
+		"search_content": {"boolean", "Se true, também busca no conteúdo de .gd/.tscn/.tres (padrão false)"},
+	}, "query")},
+
+	// --- Física 2D ---
+	{"godot_setup_physics_body", "Cria um corpo físico 2D (CharacterBody2D/RigidBody2D/StaticBody2D/Area2D) JÁ com um CollisionShape2D + shape, num único passo. Evita nó de física sem colisão.", schema(map[string][2]string{
+		"parent_path": {"string", "Nó pai ('.' para a raiz)"},
+		"node_name":   {"string", "Nome do corpo"},
+		"body_type":   {"string", "CharacterBody2D (padrão), RigidBody2D, StaticBody2D, Area2D"},
+		"shape_type":  {"string", "RectangleShape2D (padrão) ou CircleShape2D"},
+		"size":        {"array", "Tamanho [x,y] p/ RectangleShape2D"},
+		"radius":      {"number", "Raio p/ CircleShape2D"},
+		"position":    {"array", "Posição [x,y] do corpo (opcional)"},
+	}, "parent_path")},
+	{"godot_set_physics_layers", "Define collision_layer e collision_mask de um corpo físico (bitmask).", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do corpo físico"},
+		"layer":     {"number", "collision_layer (bitmask)"},
+		"mask":      {"number", "collision_mask (bitmask)"},
+	}, "node_path")},
+	{"godot_get_physics_layers", "Lê collision_layer e collision_mask de um corpo físico.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do corpo físico"},
+	}, "node_path")},
+	{"godot_add_raycast", "Adiciona um RayCast2D a um nó pai (para detecção de colisão/linha de visão).", schema(map[string][2]string{
+		"parent_path":     {"string", "Nó pai ('.' para a raiz)"},
+		"node_name":       {"string", "Nome do RayCast2D"},
+		"target_position": {"array", "Direção/alcance [x,y] (relativo ao nó)"},
+		"enabled":         {"boolean", "Ativo (padrão true)"},
+	}, "parent_path")},
+
+	// --- Animação (AnimationPlayer) ---
+	{"godot_create_animation", "Cria uma Animation vazia num AnimationPlayer (biblioteca padrão). Depois use add_animation_track + set_animation_keyframe.", schema(map[string][2]string{
+		"node_path":      {"string", "Caminho do AnimationPlayer"},
+		"animation_name": {"string", "Nome da nova animação"},
+		"length":         {"number", "Duração em segundos (padrão 1.0)"},
+		"loop":           {"boolean", "Se a animação repete (padrão false)"},
+	}, "node_path", "animation_name")},
+	{"godot_add_animation_track", "Adiciona uma track de VALOR (nó:propriedade) a uma animação existente. Ex: track_path 'Sprite2D:position'.", schema(map[string][2]string{
+		"node_path":      {"string", "Caminho do AnimationPlayer"},
+		"animation_name": {"string", "Nome da animação"},
+		"track_path":     {"string", "Caminho da propriedade animada (ex: 'Sprite2D:position', '.:modulate')"},
+	}, "node_path", "animation_name", "track_path")},
+	{"godot_set_animation_keyframe", "Insere um keyframe numa track de animação (por track_index ou track_path) em um tempo dado.", schema(map[string][2]string{
+		"node_path":      {"string", "Caminho do AnimationPlayer"},
+		"animation_name": {"string", "Nome da animação"},
+		"track_index":    {"number", "Índice da track (ou informe track_path)"},
+		"track_path":     {"string", "Caminho da track (alternativa ao índice)"},
+		"time":           {"number", "Tempo do keyframe em segundos"},
+		"value":          {"string|number|boolean|array", "Valor no keyframe (vetores [x,y])"},
+	}, "node_path", "animation_name")},
 }

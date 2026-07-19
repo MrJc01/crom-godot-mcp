@@ -4,7 +4,7 @@ Referência: **godot-mcp-pro** (`youichi-uda/godot-mcp-pro`) — **175 tools** (
 84 (lite), 35 (minimal). Proprietário ($15, não importável). Reimplementamos as
 capacidades no nosso servidor MIT.
 
-**Estado atual do crom-godot-mcp: 53 ferramentas.** Este arquivo lista TODAS as 175
+**Estado atual do crom-godot-mcp: 74 ferramentas.** Este arquivo lista TODAS as 175
 do godot-mcp-pro por categoria, marcando nossa cobertura, para saber o que falta.
 
 ## Legenda
@@ -19,8 +19,8 @@ do godot-mcp-pro por categoria, marcando nossa cobertura, para saber o que falta
 - ✅ get_project_settings (`get_project_setting`)
 - ✅ set_project_setting (`set_project_setting`)
 - 🟡 get_filesystem_tree (`list_project_dir` — por diretório, não árvore inteira)
-- ⬜ get_project_info
-- ⬜ search_files
+- ✅ get_project_info (`godot_get_project_info`)
+- ✅ search_files (`godot_search_files`)
 - ⬜ uid_to_project_path
 - ⬜ project_path_to_uid
 
@@ -33,7 +33,7 @@ do godot-mcp-pro por categoria, marcando nossa cobertura, para saber o que falta
 - ✅ stop_scene (`stop_scene`)
 - ✅ save_scene (`save_scene`)
 - 🟡 get_scene_file_content (`read_project_file` no .tscn)
-- ⬜ delete_scene
+- ✅ delete_scene (`godot_delete_scene`)
 
 ## Node (17) — temos 8, parcial 4
 - ✅ add_node (`add_node`)
@@ -45,11 +45,11 @@ do godot-mcp-pro por categoria, marcando nossa cobertura, para saber o que falta
 - ✅ rename_node (`rename_node`)
 - ✅ connect_signal (`connect_signal`)
 - 🟡 set_node_groups (`add_to_group` / `remove_from_group`)
-- 🟡 get_node_groups (via `get_scene_tree`? não dedicada)
+- ✅ get_node_groups (`godot_get_node_groups`) *(agora dedicada)*
 - 🟡 get_editor_selection (`get_open_editor_context`)
-- 🟡 get_node_properties (via `get_scene_tree`, não dedicada)
-- ⬜ disconnect_signal
-- ⬜ find_nodes_in_group
+- ✅ get_node_properties (`godot_get_node_properties`) *(agora dedicada)*
+- ✅ disconnect_signal (`godot_disconnect_signal`)
+- ✅ find_nodes_in_group (`godot_find_nodes_in_group`)
 - ⬜ select_nodes
 - ⬜ clear_editor_selection
 - ⬜ set_anchor_preset
@@ -86,26 +86,26 @@ do godot-mcp-pro por categoria, marcando nossa cobertura, para saber o que falta
 ## Runtime (19) — temos 2, parcial 2  ⭐ (área mais fraca vs pro)
 - ✅ get_game_scene_tree (`get_runtime_scene_tree`)
 - ✅ monitor_properties (`record_property_over_time`)
-- 🟡 get_game_node_properties (`get_runtime_property` — single)
+- ✅ get_game_node_properties (`godot_get_game_node_properties`) *(agora dedicada)*
 - 🟡 capture_frames (`record_property_over_time` — por propriedade, não frames)
-- ⬜ set_game_node_property
+- ✅ set_game_node_property (`godot_set_game_node_property`)
 - ⬜ execute_game_script
 - ⬜ start_recording / stop_recording / replay_recording
 - ⬜ find_nodes_by_script
 - ⬜ get_autoload
 - ⬜ batch_get_properties
-- ⬜ find_ui_elements
-- ⬜ click_button_by_text
-- ⬜ wait_for_node
+- ✅ find_ui_elements (`godot_find_ui_elements`)
+- ✅ click_button_by_text (`godot_click_button_by_text`)
+- ✅ wait_for_node (`godot_wait_for_node`)
 - ⬜ find_nearby_nodes
 - ⬜ navigate_to / move_to
 
 ## Animation (6) — temos 1, parcial 1
 - ✅ list_animations (`list_animations`)
 - 🟡 get_animation_info (`list_animations`)
-- ⬜ create_animation
-- ⬜ add_animation_track
-- ⬜ set_animation_keyframe
+- ✅ create_animation (`godot_create_animation`)
+- ✅ add_animation_track (`godot_add_animation_track`)
+- ✅ set_animation_keyframe (`godot_set_animation_keyframe`)
 - ⬜ remove_animation
 
 ## TileMap (6) — temos 2, parcial 1
@@ -117,12 +117,12 @@ do godot-mcp-pro por categoria, marcando nossa cobertura, para saber o que falta
 - ⬜ tilemap_get_info
 
 ## Physics (6) — parcial 2
-- 🟡 setup_physics_body (`add_nodes_batch` com CharacterBody2D + shape inline)
+- ✅ setup_physics_body (`godot_setup_physics_body`) *(agora dedicada)*
 - 🟡 setup_collision (recurso inline `shape` em `set_node_property`/`add_node`)
-- ⬜ set_physics_layers
-- ⬜ get_physics_layers
+- ✅ set_physics_layers (`godot_set_physics_layers`)
+- ✅ get_physics_layers (`godot_get_physics_layers`)
 - ⬜ get_collision_info
-- ⬜ add_raycast
+- ✅ add_raycast (`godot_add_raycast`)
 
 ## Resource (6) — temos 1, parcial 1
 - ✅ create_resource (`create_resource`)
@@ -173,9 +173,9 @@ do godot-mcp-pro por categoria, marcando nossa cobertura, para saber o que falta
 ## Resumo de paridade
 | | godot-mcp-pro | crom-godot-mcp |
 |---|---|---|
-| Full | 175 | **53** |
-| Cobertura direta (✅) | — | ~34 |
-| Parcial (🟡) | — | ~17 |
+| Full | 175 | **74** |
+| Cobertura direta (✅) | — | ~55 |
+| Parcial (🟡) | — | ~9 |
 | Nossas extras (🆕) | — | ~8 |
 
 **Prioridade para paridade útil (2D + feedback):** Runtime (set_game_node_property,
