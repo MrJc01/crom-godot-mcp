@@ -28,3 +28,16 @@ done
 
 count=$(grep -oE '"godot_[a-z_]+"' tools.go | sort -u | wc -l)
 echo "Pronto. ${count} ferramentas expostas."
+
+# --- Sync do lado Godot (FONTE ÚNICA) -----------------------------------------
+# O crom-godot-mcp é dono do addon Godot. Apps que o consomem sincronizam os .gd
+# core daqui (não editam cópias). Ajuste APP_ADDON via 2º argumento.
+APP_ADDON="${2:-/home/j/Documentos/GitHub/crom-godot-ai/addons/crom_ai}"
+if [[ -d "${APP_ADDON}" ]]; then
+  echo "Sincronizando lado Godot (godot-addon -> ${APP_ADDON})"
+  for f in command_processor.gd crom_runtime.gd websocket_server.gd; do
+    cp "godot-addon/${f}" "${APP_ADDON}/${f}"
+    echo "  ✓ ${f}"
+  done
+  echo "Sync do addon Godot concluído."
+fi

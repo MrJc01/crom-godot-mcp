@@ -153,6 +153,63 @@ do godot-mcp-pro por categoria, marcando nossa cobertura, para saber o que falta
 
 ---
 
+## 🗺️ ROADMAP para 215+ ferramentas
+
+**Estado: 74.** Faltam ~96 do godot-mcp-pro para paridade total (175) + 30 originais nossas = **~215**.
+
+### A) Completar paridade godot-mcp-pro (~96 tools restantes), por bloco:
+- [ ] **Bloco 5 — TileMap/Input/Editor (2D útil):** tilemap_fill_rect, tilemap_clear, tilemap_get_info, simulate_mouse_click, simulate_mouse_move, simulate_sequence, execute_editor_script, reload_plugin, reload_project, remove_animation, get_collision_info (11)
+- [ ] **Bloco 6 — Audio (6):** add_audio_player, add_audio_bus, add_audio_bus_effect, set_audio_bus, get_audio_bus_layout, get_audio_info
+- [ ] **Bloco 7 — Theme & UI (6):** create_theme, set_theme_color, set_theme_constant, set_theme_font_size, set_theme_stylebox, get_theme_info
+- [ ] **Bloco 8 — Resource/Project (8):** edit_resource, get_resource_preview, add_autoload, remove_autoload, uid_to_project_path, project_path_to_uid, list_scripts, search_in_files
+- [ ] **Bloco 9 — Node/Selection (3):** select_nodes, clear_editor_selection, set_anchor_preset
+- [ ] **Bloco 10 — Runtime avançado (10):** execute_game_script, start/stop/replay_recording, find_nodes_by_script, get_autoload, batch_get_properties, find_nearby_nodes, navigate_to, move_to
+- [ ] **Bloco 11 — Testing/QA pro (4):** run_test_scenario, compare_screenshots, run_stress_test, get_test_report
+- [ ] **Bloco 12 — Particle (5) + Navigation (6)**
+- [ ] **Bloco 13 — AnimationTree/StateMachine (8) + get_animation_info/remove_animation**
+- [ ] **Bloco 14 — Shader (6) + Export (3) + Profiling (2)**
+- [ ] **Bloco 15 — Batch/Refactoring (8) + Analysis (4)**
+- [ ] **Bloco 16 — 3D (6)** *(por último — foco 2D)*
+
+### B) 30 ferramentas ORIGINAIS nossas (🆕 além do godot-mcp-pro) — foco LLM leve
+**Compostos (menos round-trips p/ modelo fraco):**
+1. `godot_scaffold_2d_game` — cena principal + Player + Camera2D + input actions num passo
+2. `godot_add_player_controller` — CharacterBody2D + script WASD + colisão, pronto
+3. `godot_setup_ui_hud` — CanvasLayer + Labels de score/vidas
+4. `godot_add_area_trigger` — Area2D + colisão + sinal body_entered conectado
+5. `godot_create_placeholder_sprite` — textura colorida gerada e atribuída
+6. `godot_add_timer_wired` — Timer + autostart + timeout conectado a um método
+7. `godot_setup_tilemap_grid` — TileMapLayer + TileSet + tiles placeholder
+8. `godot_add_parallax_background` — ParallaxBackground + camadas
+9. `godot_generate_collision_from_sprite` — CollisionShape2D dimensionado ao Sprite2D
+10. `godot_add_state_machine_script` — boilerplate de FSM anexado
+
+**QA/feedback (nossa tese):**
+11. `godot_verify_input_response` — simula input e afirma que uma prop mudou
+12. `godot_snapshot_scene_state` — dump JSON da cena p/ diff
+13. `godot_diff_scene_snapshots` — compara dois snapshots
+14. `godot_lint_scene` — heurísticas (nó sem colisão, timer parado, sinal não conectado)
+15. `godot_check_signal_wiring` — acha handlers `_on_*` cujo sinal não está conectado
+16. `godot_run_headless_smoke` — roda headless N frames, devolve erros + movimento
+17. `godot_assert_no_console_errors` — falha se houver qualquer erro no console
+18. `godot_wait_and_assert` — wait_for_node + assert num passo
+19. `godot_measure_fps` — amostra de FPS em runtime
+20. `godot_scan_godot3_syntax` — acha API Godot 3 em .gd (update/yield/.instance/Color.gray)
+
+**Workflow/projeto:**
+21. `godot_new_project_structure` — cria pastas scenes/scripts/assets + .gitignore
+22. `godot_get_scene_stats` — contagem de nós/scripts/complexidade
+23. `godot_find_missing_resources` — refs ext_resource quebradas
+24. `godot_fix_godot3_syntax` — auto-corrige 3→4 num .gd
+25. `godot_bulk_set_property` — define uma prop em todos os nós de um tipo
+26. `godot_document_scene` — gera markdown descrevendo a árvore
+27. `godot_add_pickup` — item colecionável (Area2D + sinal + auto-free)
+28. `godot_add_killzone` — zona de morte (Area2D + reinício)
+29. `godot_set_window_config` — tamanho/título/stretch da janela do jogo
+30. `godot_export_and_run` — export debug + roda
+
+---
+
 ## 🆕 Nossas ferramentas ALÉM do godot-mcp-pro (foco no LLM leve)
 - ⭐ `godot_verify_playable` — **composto que fecha o feedback loop**: roda a cena
   headless, coleta erros (autoritativo via stderr), detecta movimento e devolve
