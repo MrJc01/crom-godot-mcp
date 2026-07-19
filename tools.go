@@ -357,4 +357,422 @@ var catalog = []toolDef{
 		"time":           {"number", "Tempo do keyframe em segundos"},
 		"value":          {"string|number|boolean|array", "Valor no keyframe (vetores [x,y])"},
 	}, "node_path", "animation_name")},
+
+	// --- BLOCO 5: TileMap extras ---
+	{"godot_tilemap_fill_rect", "Preenche um retângulo de células num TileMap/TileMapLayer com um tile (coordenadas 'from' a 'to').", schema(map[string][2]string{
+		"node_path":        {"string", "Caminho do nó TileMap/TileMapLayer"},
+		"from":             {"array", "Canto inicial [x, y] do retângulo"},
+		"to":               {"array", "Canto final [x, y] do retângulo"},
+		"source_id":        {"number", "ID da fonte de tile no TileSet (padrão: 0)"},
+		"atlas_coords":     {"array", "Coordenadas no atlas [x, y] (padrão: [0,0])"},
+		"alternative_tile": {"number", "ID do tile alternativo (padrão: 0)"},
+		"layer":            {"number", "Layer do TileMap legado (só TileMap, padrão: 0)"},
+	}, "node_path", "from", "to")},
+	{"godot_tilemap_clear", "Limpa TODAS as células de um TileMap/TileMapLayer (ou uma camada específica do TileMap).", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó TileMap/TileMapLayer"},
+		"layer":     {"number", "Camada a limpar (só TileMap; omitir = todas)"},
+	}, "node_path")},
+	{"godot_tilemap_get_info", "Retorna metadados de um TileMap/TileMapLayer: TileSet, tile_size, fontes, camadas e contagem de células.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó TileMap/TileMapLayer"},
+	}, "node_path")},
+
+	// --- BLOCO 5: Input extras ---
+	{"godot_simulate_mouse_click", "Simula um clique do mouse (press + release) nas coordenadas especificadas do jogo em execução.", schema(map[string][2]string{
+		"position":     {"array", "Coordenadas [x, y] do clique"},
+		"button":       {"number", "Botão: 1=esquerdo (padrão), 2=direito, 3=meio"},
+		"double_click": {"boolean", "Se é duplo clique (padrão false)"},
+	}, "position")},
+	{"godot_simulate_mouse_move", "Simula o movimento do mouse para as coordenadas especificadas do jogo em execução.", schema(map[string][2]string{
+		"position": {"array", "Coordenadas destino [x, y]"},
+		"relative": {"array", "Movimento relativo [dx, dy] (opcional)"},
+	}, "position")},
+	{"godot_simulate_sequence", "Executa uma SEQUÊNCIA de inputs com delays entre cada passo (ex: direita, direita, cima, espaço). Cada step pode ser key, action, mouse_click ou wait.", schema(map[string][2]string{
+		"steps":       {"array", `Array de passos. Cada passo: {"type":"key","key":"Right"}, {"type":"action","action":"jump"}, {"type":"mouse_click","position":[100,200]}, {"type":"wait"}. Opcional: "delay_ms" e "hold_ms" por passo.`},
+		"interval_ms": {"number", "Delay padrão entre passos em ms (padrão: 100, máx: 2000)"},
+	}, "steps")},
+
+	// --- BLOCO 5: Editor extras ---
+	{"godot_execute_editor_script", "Executa um snippet GDScript no contexto do editor (como EditorScript). O código é envolvido em _run() automaticamente. Poderoso mas use com cuidado.", schema(map[string][2]string{
+		"code": {"string", "Código GDScript a executar (será envolvido em @tool extends EditorScript / func _run())"},
+	}, "code")},
+	{"godot_reload_plugin", "Desabilita e re-habilita um EditorPlugin pelo nome da pasta (recarrega). Útil após alterar scripts do plugin.", schema(map[string][2]string{
+		"plugin_name": {"string", "Nome da pasta do addon em addons/ (ex: crom_ai)"},
+	}, "plugin_name")},
+	{"godot_reload_project", "Reinicia o editor Godot inteiro. ATENÇÃO: a conexão WebSocket será perdida — reconecte após o restart.", schema(nil)},
+
+	// --- BLOCO 5: Animation extras ---
+	{"godot_remove_animation", "Remove uma animação de um AnimationPlayer.", schema(map[string][2]string{
+		"node_path":      {"string", "Caminho do AnimationPlayer"},
+		"animation_name": {"string", "Nome da animação a remover"},
+	}, "node_path", "animation_name")},
+
+	// --- BLOCO 5: Physics extras ---
+	{"godot_get_collision_info", "Retorna informações de colisão de um corpo físico: collision_layer, collision_mask, shapes filhas (tipo, tamanho/raio, disabled). Para Area2D inclui monitoring/monitorable.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do corpo físico (CharacterBody2D, RigidBody2D, StaticBody2D, Area2D)"},
+	}, "node_path")},
+
+	// --- BLOCO 6: Audio ---
+	{"godot_add_audio_player", "Adiciona um nó de áudio (AudioStreamPlayer, AudioStreamPlayer2D ou 3D) à cena.", schema(map[string][2]string{
+		"parent_path": {"string", "Caminho do nó pai (padrão: root)"},
+		"type":        {"string", "Tipo: AudioStreamPlayer, AudioStreamPlayer2D ou AudioStreamPlayer3D"},
+		"node_name":   {"string", "Nome do nó"},
+		"stream_path": {"string", "Caminho do recurso de áudio (res://...)"},
+		"bus":         {"string", "Nome do bus de áudio (ex: Master)"},
+		"volume_db":   {"number", "Volume em dB"},
+		"autoplay":    {"boolean", "Se deve tocar automaticamente"},
+	})},
+	{"godot_add_audio_bus", "Adiciona um novo bus de áudio ao AudioServer.", schema(map[string][2]string{
+		"bus_name":  {"string", "Nome do novo bus"},
+		"send":      {"string", "Nome do bus de destino"},
+		"volume_db": {"number", "Volume em dB"},
+	}, "bus_name")},
+	{"godot_add_audio_bus_effect", "Adiciona um efeito a um bus de áudio.", schema(map[string][2]string{
+		"bus_name":    {"string", "Nome do bus"},
+		"effect_type": {"string", "Classe do AudioEffect (ex: AudioEffectReverb, AudioEffectFilter)"},
+	}, "bus_name", "effect_type")},
+	{"godot_set_audio_bus", "Altera configurações de um bus de áudio.", schema(map[string][2]string{
+		"bus_name":  {"string", "Nome do bus"},
+		"volume_db": {"number", "Volume em dB"},
+		"mute":      {"boolean", "Mudo"},
+		"solo":      {"boolean", "Solo"},
+		"send":      {"string", "Bus de destino"},
+	}, "bus_name")},
+	{"godot_get_audio_bus_layout", "Retorna a estrutura completa de buses de áudio e seus efeitos.", schema(nil)},
+	{"godot_get_audio_info", "Retorna informações sobre o componente de áudio de um nó.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó de áudio"},
+	}, "node_path")},
+
+	// --- BLOCO 7: Theme & UI ---
+	{"godot_create_theme", "Cria e opcionalmente salva um novo recurso Theme.", schema(map[string][2]string{
+		"save_path": {"string", "Caminho para salvar o tema (ex: res://theme.tres)"},
+	})},
+	{"godot_set_theme_color", "Define uma cor de tema em um Control.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó Control"},
+		"item_name": {"string", "Nome do item de cor"},
+		"type_name": {"string", "Nome do tipo de Control (ex: Label, Button)"},
+		"color":     {"array", "Cor RGBA [r, g, b, a]"},
+	}, "node_path", "item_name")},
+	{"godot_set_theme_constant", "Define uma constante de tema em um Control.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó Control"},
+		"item_name": {"string", "Nome da constante"},
+		"type_name": {"string", "Nome do tipo de Control"},
+		"value":     {"number", "Valor inteiro da constante"},
+	}, "node_path", "item_name", "value")},
+	{"godot_set_theme_font_size", "Define um tamanho de fonte no tema de um Control.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó Control"},
+		"item_name": {"string", "Nome do item de fonte (padrão: font_size)"},
+		"type_name": {"string", "Nome do tipo de Control"},
+		"size":      {"number", "Tamanho em pixels"},
+	}, "node_path", "size")},
+	{"godot_set_theme_stylebox", "Define um StyleBoxFlat no tema de um Control.", schema(map[string][2]string{
+		"node_path":     {"string", "Caminho do nó Control"},
+		"item_name":     {"string", "Nome da propriedade de stylebox (ex: panel)"},
+		"type_name":     {"string", "Nome do tipo de Control"},
+		"bg_color":      {"array", "Cor de fundo [r, g, b, a]"},
+		"corner_radius": {"number", "Raio dos cantos"},
+		"border_width":  {"number", "Largura das bordas"},
+	}, "node_path", "item_name")},
+	{"godot_get_theme_info", "Retorna informações sobre o tema aplicado a um nó Control.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó Control"},
+	}, "node_path")},
+
+	// --- BLOCO 8: Resource/Project ---
+	{"godot_edit_resource", "Edita propriedades de um arquivo de recurso (.tres) existente.", schema(map[string][2]string{
+		"resource_path": {"string", "Caminho do recurso (res://...)"},
+		"properties":    {"object", "Dicionário de propriedades a alterar"},
+	}, "resource_path", "properties")},
+	{"godot_get_resource_preview", "Retorna informações e metadados de um recurso.", schema(map[string][2]string{
+		"resource_path": {"string", "Caminho do recurso"},
+	}, "resource_path")},
+	{"godot_add_autoload", "Adiciona um script/cena como Autoload (Singleton) do projeto.", schema(map[string][2]string{
+		"name": {"string", "Nome do Autoload (Singleton)"},
+		"path": {"string", "Caminho do arquivo (res://...)"},
+	}, "name", "path")},
+	{"godot_remove_autoload", "Remove um Autoload do projeto.", schema(map[string][2]string{
+		"name": {"string", "Nome do Autoload"},
+	}, "name")},
+	{"godot_uid_to_project_path", "Converte um UID do Godot (uid://...) para o caminho relativo do projeto.", schema(map[string][2]string{
+		"uid": {"string", "String do UID (ex: uid://...)"},
+	}, "uid")},
+	{"godot_project_path_to_uid", "Converte um caminho de arquivo no projeto para seu UID.", schema(map[string][2]string{
+		"path": {"string", "Caminho res://..."},
+	}, "path")},
+	{"godot_list_scripts", "Lista todos os scripts (.gd, .cs) no diretório especificado ou todo o projeto.", schema(map[string][2]string{
+		"dir_path": {"string", "Diretório inicial (padrão: res://)"},
+	})},
+	{"godot_search_in_files", "Busca por um texto/string dentro de arquivos de texto (.gd, .tscn, .tres) do projeto.", schema(map[string][2]string{
+		"query":      {"string", "Texto a buscar"},
+		"dir_path":   {"string", "Diretório (padrão: res://)"},
+		"extensions": {"array", "Extensões a incluir (padrão: [.gd, .tscn, .tres, .cfg])"},
+	}, "query")},
+
+	// --- BLOCO 9: Node/Selection ---
+	{"godot_select_nodes", "Seleciona nós no inspetor/árvore de cena do editor.", schema(map[string][2]string{
+		"node_paths": {"array", "Array de caminhos de nós a selecionar"},
+	}, "node_paths")},
+	{"godot_clear_editor_selection", "Limpa a seleção atual de nós no editor.", schema(nil)},
+	{"godot_set_anchor_preset", "Define o preset de âncora/alinhamento de um nó Control (0=top-left, 8=center, 15=full-rect, etc).", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó Control"},
+		"preset":    {"number", "Preset enum (0 a 15)"},
+		"resize":    {"boolean", "Se deve redimensionar o nó ao aplicar"},
+	}, "node_path", "preset")},
+
+	// --- BLOCO 10: Runtime avançado ---
+	{"godot_execute_game_script", "Executa um snippet GDScript dentro do jogo em execução via crom_runtime.", schema(map[string][2]string{
+		"code": {"string", "Código GDScript a executar no jogo"},
+	}, "code")},
+	{"godot_start_recording", "Inicia a gravação de alterações de uma propriedade em runtime.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó"},
+		"property":  {"string", "Propriedade a monitorar"},
+	}, "node_path", "property")},
+	{"godot_stop_recording", "Para a gravação e retorna a lista de amostras gravadas.", schema(map[string][2]string{
+		"samples": {"number", "Número de amostras finais a coletar"},
+	})},
+	{"godot_replay_recording", "Aplica as amostras da gravação anterior de volta ao nó no jogo.", schema(nil)},
+	{"godot_find_nodes_by_script", "Acha nós no jogo em execução que possuem um determinado script.", schema(map[string][2]string{
+		"script_path": {"string", "Caminho do script res://..."},
+	}, "script_path")},
+	{"godot_get_autoload", "Lista todos os Autoloads configurados e seus estados.", schema(nil)},
+	{"godot_batch_get_properties", "Retorna propriedades de múltiplos nós do jogo em execução de uma só vez.", schema(map[string][2]string{
+		"node_paths": {"array", "Lista de caminhos de nós"},
+		"properties": {"array", "Lista de propriedades"},
+	}, "node_paths", "properties")},
+	{"godot_find_nearby_nodes", "Localiza nós próximos a uma determinada posição em runtime 2D/3D.", schema(map[string][2]string{
+		"position": {"array", "Coordenadas [x, y] ou [x, y, z]"},
+		"radius":   {"number", "Raio de busca em pixels/unidades"},
+	}, "position", "radius")},
+	{"godot_navigate_to", "Solicita que um NavigationAgent2D/3D navegue até uma posição alvo.", schema(map[string][2]string{
+		"agent_path": {"string", "Caminho do nó NavigationAgent"},
+		"target":     {"array", "Coordenadas de destino"},
+	}, "agent_path", "target")},
+	{"godot_move_to", "Move suavemente um nó até uma posição alvo em runtime.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó"},
+		"target":    {"array", "Coordenadas [x, y] ou [x, y, z]"},
+		"speed":     {"number", "Velocidade de movimento"},
+	}, "node_path", "target")},
+
+	// --- BLOCO 11: Testing/QA ---
+	{"godot_compare_screenshots", "Compara duas imagens PNG e calcula a porcentagem e contagem de pixels diferentes.", schema(map[string][2]string{
+		"path_a": {"string", "Caminho da primeira imagem"},
+		"path_b": {"string", "Caminho da segunda imagem"},
+	}, "path_a", "path_b")},
+	{"godot_run_stress_test", "Executa a cena headless por N frames para detectar travamentos e vazamentos.", schema(map[string][2]string{
+		"scene_path": {"string", "Caminho da cena (opcional, padrão: main scene)"},
+		"frames":     {"number", "Quantidade de frames a rodar (padrão: 300)"},
+	})},
+	{"godot_get_test_report", "Gera um relatório automatizado de testes para uma cena.", schema(map[string][2]string{
+		"scene_path": {"string", "Caminho da cena"},
+	})},
+
+	// --- BLOCO 12: Particle + Navigation ---
+	{"godot_create_particles", "Cria um nó GPUParticles2D ou GPUParticles3D na cena.", schema(map[string][2]string{
+		"parent_path": {"string", "Caminho do pai"},
+		"node_name":   {"string", "Nome do nó"},
+		"2d":          {"boolean", "Se é 2D (true) ou 3D (false)"},
+		"amount":      {"number", "Quantidade de partículas"},
+		"lifetime":    {"number", "Tempo de vida em segundos"},
+		"emitting":    {"boolean", "Emitindo imediatamente"},
+	})},
+	{"godot_set_particle_material", "Define propriedades de um ParticleProcessMaterial.", schema(map[string][2]string{
+		"node_path":            {"string", "Caminho do nó de partículas"},
+		"direction":            {"array", "Vetor de direção [x, y, z]"},
+		"spread":               {"number", "Ângulo de espalhamento em graus"},
+		"gravity":              {"array", "Gravidade [x, y, z]"},
+		"initial_velocity_min": {"number", "Velocidade inicial mínima"},
+		"initial_velocity_max": {"number", "Velocidade inicial máxima"},
+	}, "node_path")},
+	{"godot_set_particle_color_gradient", "Define uma rampa de cores (Gradient) para as partículas.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó de partículas"},
+		"colors":    {"array", "Array de cores RGBA [[r,g,b,a], ...]"},
+	}, "node_path", "colors")},
+	{"godot_apply_particle_preset", "Aplica um preset pronto (fire, smoke, sparks, explosion) às partículas.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó de partículas"},
+		"preset":    {"string", "Nome do preset: fire, smoke, sparks, explosion"},
+	}, "node_path", "preset")},
+	{"godot_get_particle_info", "Retorna a configuração atual de um emissor de partículas.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó de partículas"},
+	}, "node_path")},
+	{"godot_setup_navigation_region", "Cria uma NavigationRegion2D com NavigationPolygon associado.", schema(map[string][2]string{
+		"parent_path": {"string", "Caminho do nó pai"},
+		"node_name":   {"string", "Nome da região"},
+	})},
+	{"godot_setup_navigation_agent", "Cria um nó NavigationAgent2D na cena.", schema(map[string][2]string{
+		"parent_path":             {"string", "Caminho do nó pai"},
+		"node_name":               {"string", "Nome do agente"},
+		"target_desired_distance": {"number", "Distância mínima do alvo"},
+		"path_desired_distance":   {"number", "Distância do ponto do caminho"},
+	})},
+	{"godot_bake_navigation_mesh", "Bake do polígono de navegação de um NavigationRegion2D.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho da NavigationRegion2D"},
+	}, "node_path")},
+	{"godot_set_navigation_layers", "Define as camadas de navegação (navigation_layers bitmask) em um nó.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó"},
+		"layers":    {"number", "Bitmask de camadas"},
+	}, "node_path", "layers")},
+	{"godot_get_navigation_info", "Retorna dados de navegação de um nó.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó de navegação"},
+	}, "node_path")},
+
+	// --- BLOCO 13: AnimationTree/StateMachine ---
+	{"godot_create_animation_tree", "Cria um nó AnimationTree configurado com nó raiz.", schema(map[string][2]string{
+		"parent_path": {"string", "Caminho do nó pai"},
+		"node_name":   {"string", "Nome do AnimationTree"},
+		"root_type":   {"string", "Tipo da raiz: AnimationNodeStateMachine ou AnimationNodeBlendTree"},
+		"anim_player": {"string", "NodePath para o AnimationPlayer"},
+	})},
+	{"godot_get_animation_tree_structure", "Retorna a estrutura interna e estado de um AnimationTree.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do AnimationTree"},
+	}, "node_path")},
+	{"godot_set_tree_parameter", "Define o valor de um parâmetro de blend/state no AnimationTree (parameters/...).", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do AnimationTree"},
+		"parameter": {"string", "Caminho do parâmetro (ex: parameters/playback)"},
+		"value":     {"string|number|boolean", "Novo valor do parâmetro"},
+	}, "node_path", "parameter")},
+	{"godot_add_state_machine_state", "Adiciona um nó de estado em uma AnimationNodeStateMachine.", schema(map[string][2]string{
+		"node_path":  {"string", "Caminho do AnimationTree"},
+		"state_name": {"string", "Nome do novo estado"},
+		"node_type":  {"string", "Tipo de nó (ex: AnimationNodeAnimation)"},
+		"animation":  {"string", "Nome da animação no AnimationPlayer"},
+		"position_x": {"number", "Posição X no grafo do editor"},
+		"position_y": {"number", "Posição Y no grafo do editor"},
+	}, "node_path", "state_name")},
+	{"godot_remove_state_machine_state", "Remove um estado de uma AnimationNodeStateMachine.", schema(map[string][2]string{
+		"node_path":  {"string", "Caminho do AnimationTree"},
+		"state_name": {"string", "Nome do estado a remover"},
+	}, "node_path", "state_name")},
+	{"godot_add_state_machine_transition", "Conecta dois estados com uma transição na AnimationNodeStateMachine.", schema(map[string][2]string{
+		"node_path":    {"string", "Caminho do AnimationTree"},
+		"from":         {"string", "Estado de origem"},
+		"to":           {"string", "Estado de destino"},
+		"auto_advance": {"boolean", "Se avança automaticamente"},
+	}, "node_path", "from", "to")},
+	{"godot_remove_state_machine_transition", "Remove uma transição entre dois estados na AnimationNodeStateMachine.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do AnimationTree"},
+		"from":      {"string", "Estado de origem"},
+		"to":        {"string", "Estado de destino"},
+	}, "node_path", "from", "to")},
+	{"godot_set_blend_tree_node", "Adiciona um nó ao grafo AnimationNodeBlendTree.", schema(map[string][2]string{
+		"node_path":       {"string", "Caminho do AnimationTree"},
+		"blend_node_name": {"string", "Nome do nó no BlendTree"},
+		"node_type":       {"string", "Tipo de AnimationNode"},
+		"position_x":      {"number", "Posição X no grafo"},
+		"position_y":      {"number", "Posição Y no grafo"},
+	}, "node_path", "blend_node_name")},
+
+	// --- BLOCO 14: Shader + Export + Profiling ---
+	{"godot_create_shader", "Cria um novo arquivo de shader (.gdshader).", schema(map[string][2]string{
+		"save_path":   {"string", "Caminho do arquivo (res://...)"},
+		"shader_type": {"string", "Tipo: canvas_item, spatial, particles, fog"},
+		"code":        {"string", "Código GDShader inicial (opcional)"},
+	}, "save_path")},
+	{"godot_read_shader", "Lê o código-fonte de um arquivo de shader (.gdshader).", schema(map[string][2]string{
+		"shader_path": {"string", "Caminho do shader (res://...)"},
+	}, "shader_path")},
+	{"godot_edit_shader", "Sobrescreve o código-fonte de um arquivo de shader existente.", schema(map[string][2]string{
+		"shader_path": {"string", "Caminho do shader"},
+		"code":        {"string", "Novo código do shader"},
+	}, "shader_path", "code")},
+	{"godot_assign_shader_material", "Cria um ShaderMaterial e o atribui a um nó.", schema(map[string][2]string{
+		"node_path":   {"string", "Caminho do nó"},
+		"shader_path": {"string", "Caminho do shader (.gdshader)"},
+	}, "node_path", "shader_path")},
+	{"godot_set_shader_param", "Define o valor de um uniform/parâmetro em um ShaderMaterial.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó"},
+		"param":     {"string", "Nome do uniform no shader"},
+		"value":     {"string|number|boolean|array", "Valor do uniform"},
+	}, "node_path", "param")},
+	{"godot_get_shader_params", "Lista os uniforms e parâmetros disponíveis de um ShaderMaterial.", schema(map[string][2]string{
+		"node_path": {"string", "Caminho do nó"},
+	}, "node_path")},
+	{"godot_list_export_presets", "Lista os presets de exportação configurados no export_presets.cfg do projeto.", schema(nil)},
+	{"godot_export_project", "Executa a exportação do projeto usando um preset configurado.", schema(map[string][2]string{
+		"preset":      {"string", "Nome do preset de exportação"},
+		"output_path": {"string", "Caminho do executável de saída"},
+	}, "preset", "output_path")},
+	{"godot_get_export_info", "Retorna informações sobre presets e versão do engine para exportação.", schema(nil)},
+	{"godot_get_performance_monitors", "Coleta métricas de desempenho em tempo real (FPS, tempo de render, memória, nós, draw calls).", schema(nil)},
+	{"godot_get_editor_performance", "Retorna as métricas de desempenho no contexto do editor.", schema(nil)},
+
+	// --- BLOCO 15: Batch/Refactoring + Analysis ---
+	{"godot_find_nodes_by_type", "Busca todos os nós de uma determinada classe na cena aberta.", schema(map[string][2]string{
+		"type": {"string", "Nome da classe (ex: Sprite2D, Area2D, CollisionShape2D)"},
+	}, "type")},
+	{"godot_find_signal_connections", "Lista todas as conexões de sinais ativas na cena aberta.", schema(map[string][2]string{
+		"signal": {"string", "Nome do sinal (opcional)"},
+	})},
+	{"godot_batch_set_property", "Altera uma propriedade em TODOS os nós de uma classe específica na cena.", schema(map[string][2]string{
+		"type":     {"string", "Classe dos nós afetados"},
+		"property": {"string", "Nome da propriedade"},
+		"value":    {"string|number|boolean|array", "Novo valor"},
+	}, "type", "property")},
+	{"godot_find_node_references", "Procura referências ao nome de um nó nos arquivos do projeto.", schema(map[string][2]string{
+		"node_name": {"string", "Nome do nó"},
+	}, "node_name")},
+	{"godot_get_scene_dependencies", "Lista os recursos externos (ext_resource) dos quais uma cena depende.", schema(map[string][2]string{
+		"scene_path": {"string", "Caminho da cena (res://...)"},
+	}, "scene_path")},
+	{"godot_cross_scene_set_property", "Modifica a propriedade de um nó dentro de um arquivo de cena (.tscn) sem precisar abri-la no editor.", schema(map[string][2]string{
+		"scene_path": {"string", "Caminho do arquivo .tscn"},
+		"node_path":  {"string", "Caminho do nó dentro da cena"},
+		"property":   {"string", "Nome da propriedade"},
+		"value":      {"string|number|boolean|array", "Novo valor"},
+	}, "scene_path", "node_path", "property")},
+	{"godot_find_script_references", "Busca em quais cenas e scripts um determinado script res:// é utilizado.", schema(map[string][2]string{
+		"script_path": {"string", "Caminho do script"},
+	}, "script_path")},
+	{"godot_detect_circular_dependencies", "Analisa a arvore de dependências entre cenas e detecta ciclos.", schema(map[string][2]string{
+		"scene_path": {"string", "Cena inicial (opcional, padrão: main scene)"},
+	})},
+	{"godot_analyze_scene_complexity", "Calcula métricas de complexidade de uma cena (contagem de nós, profundidade máxima, scripts).", schema(nil)},
+	{"godot_analyze_signal_flow", "Mapeia todo o fluxo de sinais e ouvintes na cena aberta.", schema(nil)},
+	{"godot_find_unused_resources", "Detecta arquivos de recursos em res:// que não aparecem referenciados em nenhuma cena ou script.", schema(map[string][2]string{
+		"dir_path": {"string", "Diretório inicial (padrão: res://)"},
+	})},
+	{"godot_get_project_statistics", "Gera estatísticas globais do projeto (contagem de scripts, cenas, recursos, cena principal).", schema(nil)},
+
+	// --- BLOCO 16: 3D ---
+	{"godot_add_mesh_instance", "Adiciona um nó MeshInstance3D com primitiva (BoxMesh, SphereMesh, etc) à cena.", schema(map[string][2]string{
+		"parent_path": {"string", "Caminho do nó pai"},
+		"node_name":   {"string", "Nome do nó"},
+		"mesh_type":   {"string", "Tipo de mesh: BoxMesh, SphereMesh, CylinderMesh, PlaneMesh, PrismMesh"},
+		"size":        {"array", "Tamanho [x, y, z] (para BoxMesh)"},
+		"radius":      {"number", "Raio (para SphereMesh)"},
+		"position":    {"array", "Posição [x, y, z]"},
+	})},
+	{"godot_setup_camera_3d", "Adiciona e configura um nó Camera3D.", schema(map[string][2]string{
+		"parent_path": {"string", "Caminho do nó pai"},
+		"node_name":   {"string", "Nome do nó"},
+		"position":    {"array", "Posição [x, y, z]"},
+		"fov":         {"number", "Campo de visão em graus (FOV)"},
+		"current":     {"boolean", "Se é a câmera ativa"},
+	})},
+	{"godot_setup_lighting", "Cria um nó de luz 3D (DirectionalLight3D, OmniLight3D, SpotLight3D).", schema(map[string][2]string{
+		"parent_path": {"string", "Caminho do nó pai"},
+		"light_type":  {"string", "Tipo de luz: DirectionalLight3D, OmniLight3D, SpotLight3D"},
+		"node_name":   {"string", "Nome do nó"},
+		"energy":      {"number", "Energia da luz"},
+		"color":       {"array", "Cor [r, g, b, a]"},
+		"position":    {"array", "Posição [x, y, z]"},
+	})},
+	{"godot_setup_environment", "Adiciona um WorldEnvironment com Environment configurado.", schema(map[string][2]string{
+		"parent_path":   {"string", "Caminho do nó pai"},
+		"node_name":     {"string", "Nome do nó"},
+		"bg_mode":       {"number", "Modo de fundo (0=clear, 1=custom_color, 2=sky)"},
+		"bg_color":      {"array", "Cor de fundo [r, g, b, a]"},
+		"ambient_color": {"array", "Cor de luz ambiente [r, g, b, a]"},
+	})},
+	{"godot_add_gridmap", "Adiciona um nó GridMap 3D à cena.", schema(map[string][2]string{
+		"parent_path": {"string", "Caminho do nó pai"},
+		"node_name":   {"string", "Nome do nó"},
+		"cell_size":   {"array", "Tamanho de cada célula [x, y, z]"},
+	})},
+	{"godot_set_material_3d", "Cria e atribui um StandardMaterial3D a uma superfície de um MeshInstance3D.", schema(map[string][2]string{
+		"node_path":      {"string", "Caminho do MeshInstance3D"},
+		"surface_index": {"number", "Índice da superfície (padrão: 0)"},
+		"albedo_color":  {"array", "Cor Albedo [r, g, b, a]"},
+		"metallic":      {"number", "Valor metálico (0 a 1)"},
+		"roughness":     {"number", "Rugosidade (0 a 1)"},
+		"emission_color": {"array", "Cor de emissão [r, g, b, a]"},
+	}, "node_path")},
 }
+
