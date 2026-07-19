@@ -1,4 +1,18 @@
+# Binários compilados
 /crom-godot-mcp
 /crom-godot-mcp-*
+godot-mcp*
 *.exe
+*.dll
+*.so
+*.dylib
 /dist/
+/bin/
+
+# Cache do Godot e arquivos temporários
+.godot/
+.crom/
+.crom_editor_script_tmp.gd
+crom_debug.log
+*.env
+.env
